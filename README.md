@@ -1,12 +1,12 @@
 # web-search-cli
-![GitHub tag (latest by date)](https://img.shields.io/github/v/tag/seuUsuario/seuRepositorio?label=version)
+![GitHub tag (latest by date)](https://img.shields.io/github/v/tag/GabrielL915/web-search-cli?label=version)
 ## Description
   A simple CLI tool to search the web using different search engines and browsers.
 
 ## Usage
 
 ```bash
-./wsc --query "node" --engine google --browser firefox
+./ws-cli --query "node" --engine google --browser firefox
 ```
 
 ## Options

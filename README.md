@@ -5,5 +5,5 @@
 needed go installed
 
 ```bash
-go run ws.go --query "node" --engine google --browser firefox
+go run cmd/main.go --query "node" --engine google --browser firefox
 ```

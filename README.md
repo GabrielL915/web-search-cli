@@ -1,9 +1,16 @@
 # web-search-cli
 
-## Command
+## Description
+  A simple CLI tool to search the web using different search engines and browsers.
 
-needed go installed
+## Usage
 
 ```bash
-go run cmd/main.go --query "node" --engine google --browser firefox
+./wsc --query "node" --engine google --browser firefox
 ```
+
+## Options
+
+- `--query`: The search query.
+- `--engine`: The search engine to use (google or duckduckgo).
+- `--browser`: The browser to use (chrome, firefox, safari, etc.).

@@ -1,6 +1,6 @@
 # web-search-cli
 
-##commando
+## Command
 
 needed go installed
 

@@ -13,4 +13,4 @@
 
 - `--query`: The search query.
 - `--engine`: The search engine to use (google or duckduckgo).
-- `--browser`: The browser to use (chrome, firefox, safari, etc.).
+- `--browser`: The browser to use (chrome, firefox.).

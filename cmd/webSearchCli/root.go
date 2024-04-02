@@ -37,9 +37,9 @@ var rootCmd = &cobra.Command{
 
 func init() {
 	cobra.OnInitialize()
-	rootCmd.Flags().StringVarP(&query, "query", "q", "", "A consulta de pesquisa (obrigatório)")
-	rootCmd.Flags().StringVarP(&engine, "engine", "e", "google", "O mecanismo de pesquisa a ser usado (google ou duckduckgo)")
-	rootCmd.Flags().StringVarP(&browser, "browser", "b", "", "O navegador a ser usado (chrome, firefox, safari, etc.)")
+	rootCmd.Flags().StringVarP(&query, "query", "", "", "A consulta de pesquisa (obrigatório)")
+	rootCmd.Flags().StringVarP(&engine, "engine", "", "google", "O mecanismo de pesquisa a ser usado (google ou duckduckgo)")
+	rootCmd.Flags().StringVarP(&browser, "browser", "", "", "O navegador a ser usado (chrome, firefox, safari, etc.)")
 }
 
 func Execute() {

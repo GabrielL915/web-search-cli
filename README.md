@@ -5,8 +5,15 @@
 
 ## Usage
 
+need go install
+
 ```bash
-./ws-cli --query "node" --engine google --browser firefox
+go build -o ws-cli ./cmd
+```
+then
+
+```bash
+./ws-cli --query "example" --engine google --browser firefox
 ```
 
 ## Options

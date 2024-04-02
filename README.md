@@ -1,5 +1,5 @@
 # web-search-cli
-
+![GitHub tag (latest by date)](https://img.shields.io/github/v/tag/seuUsuario/seuRepositorio?label=version)
 ## Description
   A simple CLI tool to search the web using different search engines and browsers.
 

@@ -41,7 +41,6 @@ For a list of available commands and options, use the `--help` flag:
 
 Here's a brief overview of the options you can use with web-search-cli:
 
-- `--query`: Specifies the search query
-- `--engine`: Selects the search engine (options: `google`, `duckduckgo`)
-- `--browser`: Chooses the web browser for displaying results (options: `chrome`, `firefox`)
-
+- `--query`,   `-q`: Specifies the search query
+- `--engine`,  `-e`: Selects the search engine (options: `google`, `duckduckgo`)
+- `--browser`, `-b`: Chooses the web browser for displaying results (options: `chrome`, `firefox`)

@@ -12,40 +12,57 @@ type WebSearch struct {
 	searchURL string
 }
 
-func NewWebSearch(engine, query string) (*WebSearch, error) {
-	var searchURL string
+type browser func(ws *WebSearch, browser string) error
 
-	switch engine {
-	case "google":
-		searchURL = "https://www.google.com/search?q=" + url.QueryEscape(query)
-	case "duckduckgo":
-		searchURL = "https://duckduckgo.com/?q=" + url.QueryEscape(query)
-	default:
-		return nil, fmt.Errorf("Mecanismo de pesquisa '%s' não suportado", engine)
+var engines = map[string]string{
+	"google":     "https://www.google.com/search?q=%s",
+	"duckduckgo": "https://duckduckgo.com/?q=%s",
+}
+var so = map[string]browser{
+	"windows": openBrowserWindows,
+	"darwin":  openBrowserMacOS,
+	"linux":   openBrowserLinux,
+}
+
+func NewWebSearch(engine, query string) (*WebSearch, error) {
+	searchURL, ok := engines[engine]
+	if !ok {
+		return nil, fmt.Errorf("engine não suportado: %s", engine)
 	}
+	searchURL = fmt.Sprintf(searchURL, url.QueryEscape(query))
 
 	return &WebSearch{engine: engine, searchURL: searchURL}, nil
 }
 
-func (ws *WebSearch) OpenBrowser(browser string) error {
-	var cmd string
-	var args []string
-
-	switch runtime.GOOS {
-	case "windows":
-		cmd = "cmd"
-		args = []string{"/c"}
-		if browser != "" {
-			args = append(args, "start", browser)
-		} else {
-			args = append(args, "start")
-		}
-	case "darwin":
-		cmd = "open"
-	default: // linux, *bsd, etc.
-		cmd = "xdg-open"
+func openBrowserWindows(ws *WebSearch, browser string) error {
+	cmd := "cmd"
+	args := []string{"/c"}
+	if browser != "" {
+		args = append(args, "start", browser)
+	} else {
+		args = append(args, "start")
 	}
-
 	args = append(args, ws.searchURL)
 	return exec.Command(cmd, args...).Run()
+}
+
+func openBrowserMacOS(ws *WebSearch, browser string) error {
+	cmd := "open"
+	args := []string{ws.searchURL}
+	return exec.Command(cmd, args...).Run()
+}
+
+func openBrowserLinux(ws *WebSearch, browser string) error {
+	cmd := "xdg-open"
+	args := []string{ws.searchURL}
+	return exec.Command(cmd, args...).Run()
+
+}
+
+func (ws *WebSearch) OpenBrowser(browser string) error {
+	open, ok := so[runtime.GOOS]
+	if !ok {
+		return fmt.Errorf("sistema operacional não suportado: %s", runtime.GOOS)
+	}
+	return open(ws, browser)
 }

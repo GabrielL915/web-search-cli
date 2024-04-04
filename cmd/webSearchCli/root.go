@@ -5,10 +5,12 @@ import (
 	"os"
 
 	"github.com/GabrielL915/web-search-cli/internal"
+	"github.com/fatih/color"
 	"github.com/spf13/cobra"
 )
 
 var query, engine, browser string
+var red = color.New(color.FgRed).SprintFunc()
 
 var rootCmd = &cobra.Command{
 	Use:   "ws-cli",
@@ -17,20 +19,22 @@ var rootCmd = &cobra.Command{
 	usando flags para especificar a consulta de pesquisa, o mecanismo de pesquisa e o navegador.`,
 	Run: func(cmd *cobra.Command, args []string) {
 		if query == "" {
-			fmt.Println("Erro: A consulta de pesquisa é obrigatória.")
+			fmt.Println(red("Erro: A consulta de pesquisa é obrigatória."))
 			cmd.Help()
 			return
 		}
 
 		ws, err := internal.NewWebSearch(engine, query)
 		if err != nil {
-			fmt.Printf("Erro: %v\n", err)
+			fmt.Printf(red("Erro: %v\n"), err)
+			cmd.Help()
 			return
 		}
 
 		err = ws.OpenBrowser(browser)
 		if err != nil {
-			fmt.Printf("Erro ao abrir o navegador: %v\n", err)
+			fmt.Printf(red("Erro ao abrir o navegador: %v\n"), err)
+			cmd.Help()
 		}
 	},
 }

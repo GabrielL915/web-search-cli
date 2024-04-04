@@ -45,6 +45,9 @@ func NewWebSearch(engine, query string) (*WebSearch, error) {
 }
 
 func (o *openInWindows) OpenBrowser(ws *WebSearch, browser string) error {
+	if browser == "" {
+		return fmt.Errorf("navegador não especificado: %s", browser)
+	}
 	cmd := "cmd"
 	args := []string{"/c", "start"}
 	if browser != "" {

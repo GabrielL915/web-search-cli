@@ -11,26 +11,31 @@ type WebSearch struct {
 	engine    string
 	searchURL string
 }
-type openBrowser interface {
-	OpenBrowser(ws *WebSearch, browser string) error
+type IOpenBrowser interface {
+	OpenBrowser(executor IExecute, ws *WebSearch, browser string) error
 }
+
+type IExecute interface {
+	Execute(command string, args ...string) error
+}
+
+type OpenInWindows struct{}
+type OpenInMacOs struct{}
+type OpenInLinux struct{}
+type execute struct{}
 
 var engines = map[string]string{
 	"google":     "https://www.google.com/search?q=%s",
 	"duckduckgo": "https://duckduckgo.com/?q=%s",
 }
 
-var browserOpeners = map[string]openBrowser{
-	"windows": &openInWindows{},
-	"darwin":  &openInMacOs{},
-	"linux":   &openInLinux{},
+var browserOpeners = map[string]IOpenBrowser{
+	"windows": &OpenInWindows{},
+	"darwin":  &OpenInMacOs{},
+	"linux":   &OpenInLinux{},
 }
 
-type openInWindows struct{}
-type openInMacOs struct{}
-type openInLinux struct{}
-
-func Execute(command string, args ...string) error {
+func (exe *execute) Execute(command string, args ...string) error {
 	return exec.Command(command, args...).Run()
 }
 
@@ -44,7 +49,7 @@ func NewWebSearch(engine, query string) (*WebSearch, error) {
 	return &WebSearch{engine: engine, searchURL: searchURL}, nil
 }
 
-func (o *openInWindows) OpenBrowser(ws *WebSearch, browser string) error {
+func (o *OpenInWindows) OpenBrowser(executor IExecute, ws *WebSearch, browser string) error {
 	if browser == "" {
 		return fmt.Errorf("navegador não especificado: %s", browser)
 	}
@@ -54,15 +59,15 @@ func (o *openInWindows) OpenBrowser(ws *WebSearch, browser string) error {
 		args = append(args, browser)
 	}
 	args = append(args, ws.searchURL)
-	return Execute(cmd, args...)
+	return executor.Execute(cmd, args...)
 }
 
-func (o *openInMacOs) OpenBrowser(ws *WebSearch, browser string) error {
-	return Execute("open", ws.searchURL)
+func (o *OpenInMacOs) OpenBrowser(executor IExecute, ws *WebSearch, browser string) error {
+	return executor.Execute("open", ws.searchURL)
 }
 
-func (o *openInLinux) OpenBrowser(ws *WebSearch, browser string) error {
-	return Execute("xdg-open", ws.searchURL)
+func (o *OpenInLinux) OpenBrowser(executor IExecute, ws *WebSearch, browser string) error {
+	return executor.Execute("xdg-open", ws.searchURL)
 }
 
 func (ws *WebSearch) OpenBrowser(browser string) error {
@@ -70,5 +75,5 @@ func (ws *WebSearch) OpenBrowser(browser string) error {
 	if !ok {
 		return fmt.Errorf("sistema operacional não suportado: %s", runtime.GOOS)
 	}
-	return opener.OpenBrowser(ws, browser)
+	return opener.OpenBrowser(&execute{}, ws, browser)
 }

@@ -11,17 +11,27 @@ type WebSearch struct {
 	engine    string
 	searchURL string
 }
-
-type browser func(ws *WebSearch, browser string) error
+type openBrowser interface {
+	OpenBrowser(ws *WebSearch, browser string) error
+}
 
 var engines = map[string]string{
 	"google":     "https://www.google.com/search?q=%s",
 	"duckduckgo": "https://duckduckgo.com/?q=%s",
 }
-var so = map[string]browser{
-	"windows": openBrowserWindows,
-	"darwin":  openBrowserMacOS,
-	"linux":   openBrowserLinux,
+
+var browserOpeners = map[string]openBrowser{
+	"windows": &openInWindows{},
+	"darwin":  &openInMacOs{},
+	"linux":   &openInLinux{},
+}
+
+type openInWindows struct{}
+type openInMacOs struct{}
+type openInLinux struct{}
+
+func Execute(command string, args ...string) error {
+	return exec.Command(command, args...).Run()
 }
 
 func NewWebSearch(engine, query string) (*WebSearch, error) {
@@ -34,35 +44,28 @@ func NewWebSearch(engine, query string) (*WebSearch, error) {
 	return &WebSearch{engine: engine, searchURL: searchURL}, nil
 }
 
-func openBrowserWindows(ws *WebSearch, browser string) error {
+func (o *openInWindows) OpenBrowser(ws *WebSearch, browser string) error {
 	cmd := "cmd"
-	args := []string{"/c"}
+	args := []string{"/c", "start"}
 	if browser != "" {
-		args = append(args, "start", browser)
-	} else {
-		args = append(args, "start")
+		args = append(args, browser)
 	}
 	args = append(args, ws.searchURL)
-	return exec.Command(cmd, args...).Run()
+	return Execute(cmd, args...)
 }
 
-func openBrowserMacOS(ws *WebSearch, browser string) error {
-	cmd := "open"
-	args := []string{ws.searchURL}
-	return exec.Command(cmd, args...).Run()
+func (o *openInMacOs) OpenBrowser(ws *WebSearch, browser string) error {
+	return Execute("open", ws.searchURL)
 }
 
-func openBrowserLinux(ws *WebSearch, browser string) error {
-	cmd := "xdg-open"
-	args := []string{ws.searchURL}
-	return exec.Command(cmd, args...).Run()
-
+func (o *openInLinux) OpenBrowser(ws *WebSearch, browser string) error {
+	return Execute("xdg-open", ws.searchURL)
 }
 
 func (ws *WebSearch) OpenBrowser(browser string) error {
-	open, ok := so[runtime.GOOS]
+	opener, ok := browserOpeners[runtime.GOOS]
 	if !ok {
 		return fmt.Errorf("sistema operacional não suportado: %s", runtime.GOOS)
 	}
-	return open(ws, browser)
+	return opener.OpenBrowser(ws, browser)
 }
